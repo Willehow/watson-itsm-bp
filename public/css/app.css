@@ -36,11 +36,11 @@ div {
 }
 
 #view-change-button:not(.full) .not-full {
-  display: inline-block;
+  display: none;
 }
 
 #view-change-button.full .full {
-  display: inline-block;
+  display: none;
 }
 
 #contentParent {
@@ -257,6 +257,7 @@ input:-moz-placeholder {
   width: 45%;
   max-width: 32.0625rem;
   min-width: 29.6875rem;
+  display: none;
 }
 
 #payload-column.full {
@@ -273,6 +274,7 @@ input:-moz-placeholder {
   padding: 0.5rem;
   padding-left: 2.5rem;
   background: #383D3E;
+  display: none;
 }
 
 .hide {
