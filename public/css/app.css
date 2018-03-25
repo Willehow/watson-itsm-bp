@@ -16,7 +16,7 @@ div {
 }
 
 #view-change-button {
-  display: inline-block;
+  display: none;
   position: absolute;
   width: 3.125rem;
   height: 3.125rem;
