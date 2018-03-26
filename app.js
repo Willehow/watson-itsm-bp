@@ -19,6 +19,7 @@
 var express = require('express'); // app server
 var bodyParser = require('body-parser'); // parser for post requests
 var watson = require('watson-developer-cloud'); // watson sdk
+var nodemailer = require('nodemailer'); //envio de email
 
 var app = express();
 
@@ -36,6 +37,17 @@ var conversation = new watson.ConversationV1({
   version_date: '2018-02-16'
 });
 
+var textoEmail = '';
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'willehow@gmail.com',
+    pass: 'd12m10a85'
+  }
+});
+
+
+
 // Endpoint to be call from the client side
 app.post('/api/message', function(req, res) {
   var workspace = process.env.WORKSPACE_ID || '<workspace-id>';
@@ -52,11 +64,51 @@ app.post('/api/message', function(req, res) {
     input: req.body.input || {}
   };
 
+
   // Send the input to the conversation service
   conversation.message(payload, function(err, data) {
     if (err) {
       return res.status(err.code || 500).json(err);
     }
+
+    if (data.intents && data.intents[0]) {
+      var intencao = data.intents[0];
+      console.log('Antes de verificar: '+intencao.intent);
+
+
+
+      if(intencao.intent == 'contabilizar'){
+
+
+        textoEmail = data.output.text[0];
+        console.log('Texto email: '+textoEmail);
+
+      }
+
+      //Aqui vai verificar se é chamado e enviar email
+      if(intencao.intent == 'confirmar'){
+
+        console.log('Verificado, enviando email: '+intencao.intent);
+        console.log('Texto email: '+textoEmail);
+
+        var mailOptions = {
+          from: 'andre.lima@brasilprev.com.br',
+          to: 'willehow@gmail.com',
+          subject: 'Teste de email com watson',
+          text: textoEmail.toString()
+        };
+
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+
+      }
+    }
+
     return res.json(updateMessage(payload, data));
   });
 });
@@ -92,5 +144,10 @@ function updateMessage(input, response) {
   response.output.text = responseText;
   return response;
 }
+
+
+
+
+
 
 module.exports = app;
