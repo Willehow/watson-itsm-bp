@@ -39,10 +39,10 @@ var conversation = new watson.ConversationV1({
 
 var textoEmail = '';
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: 'yahoo',
   auth: {
-    user: 'willehow@gmail.com',
-    pass: 'd12m10a85'
+    user: 'willehow@yahoo.com.br',
+    pass: 'd12M10A85'
   }
 });
 
@@ -92,7 +92,7 @@ app.post('/api/message', function(req, res) {
         console.log('Texto email: '+textoEmail);
 
         var mailOptions = {
-          from: 'andre.lima@brasilprev.com.br',
+          from: 'willehow@yahoo.com.br',
           to: 'willehow@gmail.com',
           subject: 'Teste de email com watson',
           text: textoEmail.toString()
