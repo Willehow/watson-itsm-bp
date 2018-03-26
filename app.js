@@ -85,16 +85,14 @@ app.post('/api/message', function(req, res) {
         textoEmail = data.output.text[0];
         console.log('Texto email: '+textoEmail);
 
-      } else {
-      	textoEmail = '';
-      }
+      } 
 
       //Aqui vai verificar se é chamado e enviar email
       if(intencao.intent == 'confirmar'){
 
 		if(textoEmail != ''){
 	        console.log('Verificado, enviando email: '+intencao.intent);
-	        console.log('Texto email: '+textoEmail);
+	        //console.log('Texto email: '+textoEmail);
 	
 	        var mailOptions = {
 	          from: 'willehow@yahoo.com.br',
