@@ -37,7 +37,7 @@ var conversation = new watson.ConversationV1({
   version_date: '2018-02-16'
 });
 
-var textoEmail = '';
+
 var transporter = nodemailer.createTransport({
   service: 'yahoo',
   auth: {
@@ -70,6 +70,8 @@ app.post('/api/message', function(req, res) {
     if (err) {
       return res.status(err.code || 500).json(err);
     }
+    
+    var textoEmail = '';
 
     if (data.intents && data.intents[0]) {
       var intencao = data.intents[0];
