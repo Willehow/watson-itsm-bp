@@ -37,7 +37,7 @@ var conversation = new watson.ConversationV1({
   version_date: '2018-02-16'
 });
 
-
+var textoEmail = '';
 var transporter = nodemailer.createTransport({
   service: 'yahoo',
   auth: {
@@ -71,7 +71,7 @@ app.post('/api/message', function(req, res) {
       return res.status(err.code || 500).json(err);
     }
     
-    var textoEmail = '';
+
 
     if (data.intents && data.intents[0]) {
       var intencao = data.intents[0];
@@ -85,29 +85,32 @@ app.post('/api/message', function(req, res) {
         textoEmail = data.output.text[0];
         console.log('Texto email: '+textoEmail);
 
+      } else {
+      	textoEmail = '';
       }
 
       //Aqui vai verificar se é chamado e enviar email
       if(intencao.intent == 'confirmar'){
 
-        console.log('Verificado, enviando email: '+intencao.intent);
-        console.log('Texto email: '+textoEmail);
-
-        var mailOptions = {
-          from: 'willehow@yahoo.com.br',
-          to: 'willehow@gmail.com',
-          subject: 'Teste de email com watson',
-          text: textoEmail.toString()
-        };
-
-        transporter.sendMail(mailOptions, function(error, info){
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
-
+		if(textoEmail != ''){
+	        console.log('Verificado, enviando email: '+intencao.intent);
+	        console.log('Texto email: '+textoEmail);
+	
+	        var mailOptions = {
+	          from: 'willehow@yahoo.com.br',
+	          to: 'willehow@gmail.com',
+	          subject: 'Teste de email com watson',
+	          text: textoEmail.toString()
+	        };
+	
+	        transporter.sendMail(mailOptions, function(error, info){
+	          if (error) {
+	            console.log(error);
+	          } else {
+	            console.log('Email sent: ' + info.response);
+	          }
+	        });
+		}
       }
     }
 
