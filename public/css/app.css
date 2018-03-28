@@ -15,6 +15,29 @@ div {
   line-height: 1.25rem;
 }
 
+#upload-input {
+  display: none;
+}
+
+.upload-btn {
+  opacity: 0.1;
+  color: #ffffff;
+  background-color: #9370DB;
+  border: none;
+  font-size: 1rem;
+}
+
+.upload-btn:hover,
+.upload-btn:focus,
+.upload-btn:active,
+.upload-btn.active {
+  opacity: 1;
+  color: #ffffff;
+  background-color: #9370DB;
+  border: none;
+  font-size: 1rem;
+}
+
 #view-change-button {
   display: none;
   position: absolute;

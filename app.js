@@ -20,6 +20,11 @@ var express = require('express'); // app server
 var bodyParser = require('body-parser'); // parser for post requests
 var watson = require('watson-developer-cloud'); // watson sdk
 var nodemailer = require('nodemailer'); //envio de email
+var path = require('path');
+var formidable = require('formidable');
+var fs = require('fs');
+
+//app.use(express.static(path.join(__dirname, 'public')));
 
 var app = express();
 
@@ -38,6 +43,7 @@ var conversation = new watson.ConversationV1({
 });
 
 var textoEmail = '';
+var filePath = '';
 var transporter = nodemailer.createTransport({
   service: 'yahoo',
   auth: {
@@ -70,8 +76,6 @@ app.post('/api/message', function(req, res) {
     if (err) {
       return res.status(err.code || 500).json(err);
     }
-    
-
 
     if (data.intents && data.intents[0]) {
       var intencao = data.intents[0];
@@ -85,30 +89,55 @@ app.post('/api/message', function(req, res) {
         textoEmail = data.output.text[0];
         console.log('Texto email: '+textoEmail);
 
-      } 
+      }
 
       //Aqui vai verificar se é chamado e enviar email
       if(intencao.intent == 'confirmar'){
 
-		if(textoEmail != ''){
-	        console.log('Verificado, enviando email: '+intencao.intent);
-	        //console.log('Texto email: '+textoEmail);
-	
-	        var mailOptions = {
-	          from: 'willehow@yahoo.com.br',
-	          to: 'willehow@gmail.com',
-	          subject: 'Teste de email com watson',
-	          text: textoEmail.toString()
-	        };
-	
-	        transporter.sendMail(mailOptions, function(error, info){
-	          if (error) {
-	            console.log(error);
-	          } else {
-	            console.log('Email sent: ' + info.response);
-	          }
-	        });
-		}
+        console.log('Verificado, enviando email: '+intencao.intent);
+        console.log('Texto email: '+textoEmail);
+
+        if(filePath != ''){
+          var mailOptions = {
+            from: 'willehow@yahoo.com.br',
+            to: 'willehow@gmail.com',
+            subject: 'Teste de email com watson',
+            text: textoEmail.toString(),
+            attachments: [
+              {   // filename and content type is derived from path
+                  path: filePath
+              }
+            ]
+          };
+        } else {
+
+          var mailOptions = {
+            from: 'willehow@yahoo.com.br',
+            to: 'willehow@gmail.com',
+            subject: 'Teste de email com watson',
+            text: textoEmail.toString()
+          };
+
+        }
+
+        console.log(mailOptions);
+
+        transporter.sendMail(mailOptions, function(error, info){
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+            //remove o arquivo
+            fs.unlinkSync(filePath);
+            filePath = '';
+          }
+        });
+
+
+
+
+
+
       }
     }
 
@@ -151,6 +180,45 @@ function updateMessage(input, response) {
 
 
 
+
+
+app.get('/', function(req, res){
+  res.sendFile(path.join(__dirname, 'views/index.html'));
+});
+
+app.post('/upload', function(req, res){
+
+  // create an incoming form object
+  var form = new formidable.IncomingForm();
+
+  // specify that we want to allow the user to upload multiple files in a single request
+  form.multiples = true;
+
+  // store all uploads in the /uploads directory
+  form.uploadDir = path.join(__dirname, '/uploads');
+
+  // every time a file has been uploaded successfully,
+  // rename it to it's orignal name
+  form.on('file', function(field, file) {
+    //fs.rename(file.path, path.join(form.uploadDir, '1'+path.extname(file.name))); //esse caso pega a extensao do nome do arquivo
+    filePath = path.join(form.uploadDir, file.name);
+    fs.rename(file.path, path.join(form.uploadDir, file.name));
+  });
+
+  // log any errors that occur
+  form.on('error', function(err) {
+    console.log('An error has occured: \n' + err);
+  });
+
+  // once all the files have been uploaded, send a response to the client
+  form.on('end', function() {
+    res.end('success');
+  });
+
+  // parse the incoming request containing the form data
+  form.parse(req);
+
+});
 
 
 module.exports = app;
